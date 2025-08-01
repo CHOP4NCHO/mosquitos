@@ -1,0 +1,460 @@
+[
+    {
+        "id": "f6f2187d.f17ca8",
+        "type": "tab",
+        "label": "Flow 1",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "163ced5ca0babdee",
+        "type": "mqtt-broker",
+        "name": "",
+        "broker": "mosquitto",
+        "port": 1883,
+        "clientid": "",
+        "autoConnect": true,
+        "usetls": false,
+        "protocolVersion": 4,
+        "keepalive": 60,
+        "cleansession": true,
+        "autoUnsubscribe": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthRetain": "false",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closeRetain": "false",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willRetain": "false",
+        "willPayload": "",
+        "willMsg": {},
+        "userProps": "",
+        "sessionExpiry": ""
+    },
+    {
+        "id": "45acd04eec93fab5",
+        "type": "inject",
+        "z": "f6f2187d.f17ca8",
+        "name": "Estado Invernadero",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "30",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "topic": "invernadero",
+        "payload": "{\"humedadSuelo\":\"\",\"temperaturaAmbiente\":\"\",\"luminosidad\":\"\"}",
+        "payloadType": "json",
+        "x": 200,
+        "y": 240,
+        "wires": [
+            [
+                "672ae758e4eee4f3"
+            ]
+        ]
+    },
+    {
+        "id": "672ae758e4eee4f3",
+        "type": "function",
+        "z": "f6f2187d.f17ca8",
+        "name": "Generar variables aleatorias",
+        "func": "function getRandomFloat(min, max) {\n  return Math.random() * (max - min) + min;\n}\n\nvar temperaturaAmbiente = getRandomFloat(15, 40).toFixed(2)\nvar humedadSuelo = getRandomFloat(30, 80).toFixed(2)\nvar luminosidad = Math.round(getRandomFloat(300, 1100))\n\nmsg.payload.temperaturaAmbiente = temperaturaAmbiente\nmsg.payload.humedadSuelo = humedadSuelo\nmsg.payload.luminosidad = luminosidad\n\nreturn msg;\n\n\n\n\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 520,
+        "y": 240,
+        "wires": [
+            [
+                "3fc159048707e2bd"
+            ]
+        ]
+    },
+    {
+        "id": "3fc159048707e2bd",
+        "type": "mqtt out",
+        "z": "f6f2187d.f17ca8",
+        "name": "MQTT Invernadero",
+        "topic": "granja/invernadero",
+        "qos": "1",
+        "retain": "",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "163ced5ca0babdee",
+        "x": 830,
+        "y": 240,
+        "wires": []
+    },
+    {
+        "id": "5e1a7b40e3aec883",
+        "type": "mqtt in",
+        "z": "f6f2187d.f17ca8",
+        "name": "MQTT invernadero",
+        "topic": "granja/invernadero",
+        "qos": "2",
+        "datatype": "auto-detect",
+        "broker": "163ced5ca0babdee",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 190,
+        "y": 540,
+        "wires": [
+            [
+                "a98c778f61b33599"
+            ]
+        ]
+    },
+    {
+        "id": "ac42fe02b3571f44",
+        "type": "inject",
+        "z": "f6f2187d.f17ca8",
+        "name": "Estado Suelo",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "60",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "topic": "suelo",
+        "payload": "{\"porcentajeSustrato\":\"\",\"humedad\":\"\",\"alturaPlantas\":\"\"}",
+        "payloadType": "json",
+        "x": 180,
+        "y": 300,
+        "wires": [
+            [
+                "b214c65ed2fc2d2b"
+            ]
+        ]
+    },
+    {
+        "id": "1c0b204a24eaf6c4",
+        "type": "inject",
+        "z": "f6f2187d.f17ca8",
+        "name": "Estado Pollos",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "10",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "topic": "pollos",
+        "payload": "{\"huevosDisponibles\":\"\",\"kilosGranoDisponible\":\"\",\"gallinasEmpollando\":\"\"}",
+        "payloadType": "json",
+        "x": 180,
+        "y": 360,
+        "wires": [
+            [
+                "b8bbd3291df9982b"
+            ]
+        ]
+    },
+    {
+        "id": "6e6fa0bb90a2672f",
+        "type": "inject",
+        "z": "f6f2187d.f17ca8",
+        "name": "Estado Ovejas",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "30",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "topic": "ovejas",
+        "payload": "{\"ovejasComiendo\":\"\",\"alturaPasto\":\"\",\"superficiePastoDisponible\":\"\"}",
+        "payloadType": "json",
+        "x": 180,
+        "y": 420,
+        "wires": [
+            [
+                "50e6c3a12e38bfa7"
+            ]
+        ]
+    },
+    {
+        "id": "b214c65ed2fc2d2b",
+        "type": "function",
+        "z": "f6f2187d.f17ca8",
+        "name": "Generar variables aleatorias",
+        "func": "function getRandomFloat(min, max) {\n  return Math.random() * (max - min) + min;\n}\n\nvar porcentajeSustrato = getRandomFloat(1, 100).toFixed(2)\nvar humedad = getRandomFloat(30, 80).toFixed(2)\nvar alturaPlantas = Math.round(getRandomFloat(300, 1100))\n\nmsg.payload.porcentajeSustrato = porcentajeSustrato\nmsg.payload.humedad = humedad\nmsg.payload.alturaPlantas = alturaPlantas\n\nreturn msg;\n\n\n\n\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 460,
+        "y": 300,
+        "wires": [
+            [
+                "3117468226a707d6"
+            ]
+        ]
+    },
+    {
+        "id": "b8bbd3291df9982b",
+        "type": "function",
+        "z": "f6f2187d.f17ca8",
+        "name": "Generar variables aleatorias",
+        "func": "function getRandomFloat(min, max) {\n  return Math.random() * (max - min) + min;\n}\n\nvar huevosDisponibles = getRandomFloat(15, 40).toFixed(2)\nvar kilosGranoDisponible = getRandomFloat(30, 80).toFixed(2)\nvar gallinasEmpollando = Math.round(getRandomFloat(300, 1100))\n\nmsg.payload.huevosDisponibles = huevosDisponibles\nmsg.payload.kilosGranoDisponible = kilosGranoDisponible\nmsg.payload.gallinasEmpollando = gallinasEmpollando\n\nreturn msg;\n\n\n\n\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 440,
+        "y": 360,
+        "wires": [
+            [
+                "fe84cbd3bd6f82eb"
+            ]
+        ]
+    },
+    {
+        "id": "50e6c3a12e38bfa7",
+        "type": "function",
+        "z": "f6f2187d.f17ca8",
+        "name": "Generar variables aleatorias",
+        "func": "function getRandomFloat(min, max) {\n  return Math.random() * (max - min) + min;\n}\n\nvar ovejasComiendo = getRandomFloat(15, 40).toFixed(2)\nvar alturaPasto = getRandomFloat(30, 80).toFixed(2)\nvar superficiePastoDisponible = Math.round(getRandomFloat(300, 1100))\n\nmsg.payload.ovejasComiendo = ovejasComiendo\nmsg.payload.alturaPasto = alturaPasto\nmsg.payload.superficiePastoDisponible = superficiePastoDisponible\n\nreturn msg;\n\n\n\n\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 460,
+        "y": 420,
+        "wires": [
+            [
+                "5480224ca9777878"
+            ]
+        ]
+    },
+    {
+        "id": "37183134f6100559",
+        "type": "mqtt in",
+        "z": "f6f2187d.f17ca8",
+        "name": "MQTT Suelo",
+        "topic": "granja/suelo",
+        "qos": "2",
+        "datatype": "auto-detect",
+        "broker": "163ced5ca0babdee",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 170,
+        "y": 600,
+        "wires": [
+            [
+                "a969b2fdf97c5876"
+            ]
+        ]
+    },
+    {
+        "id": "1aa81e75cd9f6e15",
+        "type": "mqtt in",
+        "z": "f6f2187d.f17ca8",
+        "name": "MQTT Pollos",
+        "topic": "granja/pollos",
+        "qos": "2",
+        "datatype": "auto-detect",
+        "broker": "163ced5ca0babdee",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 170,
+        "y": 660,
+        "wires": [
+            [
+                "c2f7ebd89554f19e"
+            ]
+        ]
+    },
+    {
+        "id": "2ef69090f3fb3cad",
+        "type": "mqtt in",
+        "z": "f6f2187d.f17ca8",
+        "name": "MQTT Ovejas",
+        "topic": "granja/ovejas",
+        "qos": "2",
+        "datatype": "auto-detect",
+        "broker": "163ced5ca0babdee",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 170,
+        "y": 720,
+        "wires": [
+            [
+                "1b2c5c67be57e774"
+            ]
+        ]
+    },
+    {
+        "id": "3117468226a707d6",
+        "type": "mqtt out",
+        "z": "f6f2187d.f17ca8",
+        "name": "MQTTSuelo",
+        "topic": "granja/suelo",
+        "qos": "1",
+        "retain": "",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "163ced5ca0babdee",
+        "x": 770,
+        "y": 300,
+        "wires": []
+    },
+    {
+        "id": "fe84cbd3bd6f82eb",
+        "type": "mqtt out",
+        "z": "f6f2187d.f17ca8",
+        "name": "MQTTPollos",
+        "topic": "granja/pollos",
+        "qos": "1",
+        "retain": "",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "163ced5ca0babdee",
+        "x": 750,
+        "y": 360,
+        "wires": []
+    },
+    {
+        "id": "5480224ca9777878",
+        "type": "mqtt out",
+        "z": "f6f2187d.f17ca8",
+        "name": "MQTTOvejas",
+        "topic": "granja/ovejas",
+        "qos": "1",
+        "retain": "",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "163ced5ca0babdee",
+        "x": 750,
+        "y": 420,
+        "wires": []
+    },
+    {
+        "id": "a98c778f61b33599",
+        "type": "debug",
+        "z": "f6f2187d.f17ca8",
+        "name": "debug 1",
+        "active": true,
+        "tosidebar": true,
+        "console": true,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 530,
+        "y": 540,
+        "wires": []
+    },
+    {
+        "id": "a969b2fdf97c5876",
+        "type": "debug",
+        "z": "f6f2187d.f17ca8",
+        "name": "debug 2",
+        "active": true,
+        "tosidebar": true,
+        "console": true,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 450,
+        "y": 600,
+        "wires": []
+    },
+    {
+        "id": "c2f7ebd89554f19e",
+        "type": "debug",
+        "z": "f6f2187d.f17ca8",
+        "name": "debug 3",
+        "active": true,
+        "tosidebar": true,
+        "console": true,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 450,
+        "y": 660,
+        "wires": []
+    },
+    {
+        "id": "1b2c5c67be57e774",
+        "type": "debug",
+        "z": "f6f2187d.f17ca8",
+        "name": "debug 4",
+        "active": true,
+        "tosidebar": true,
+        "console": true,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 410,
+        "y": 740,
+        "wires": []
+    }
+]

@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>🌾 Dashboard Granja IoT</title>
+  <style>
+    body {
+      font-family: "Segoe UI", sans-serif;
+      background: #f8fafb;
+      margin: 0;
+      padding: 0;
+    }
+
+    header {
+      background-color: #3a7d44;
+      color: white;
+      padding: 1.2rem;
+      text-align: center;
+      font-size: 1.5rem;
+    }
+
+    .dashboard {
+      max-width: 1200px;
+      margin: 2rem auto 1rem;
+      padding: 0 1rem;
+    }
+
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .card {
+      background: white;
+      border-radius: 12px;
+      padding: 1rem;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      transition: transform 0.2s;
+    }
+
+    .card:hover {
+      transform: translateY(-3px);
+    }
+
+    .card h3 {
+      margin-top: 0;
+      font-size: 1.3rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .card p {
+      margin: 0.4rem 0;
+      font-size: 0.95rem;
+    }
+
+    .emoji {
+      font-size: 1.5rem;
+    }
+
+    .config-section {
+      background: #ffffff;
+      border-top: 2px solid #e1e1e1;
+      padding: 1.5rem;
+      text-align: center;
+      font-size: 1rem;
+    }
+
+    .config-section input {
+      padding: 0.5rem;
+      width: 300px;
+      max-width: 90%;
+      margin-right: 0.5rem;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+
+    .config-section button {
+      padding: 0.5rem 1rem;
+      background-color: #3a7d44;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .config-section button:hover {
+      background-color: #316a3a;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  🌿 Dashboard IoT para Mi Granja Inteligente
+</header>
+
+<section class="dashboard">
+  <div class="dashboard-grid">
+    <div class="card">
+      <h3><span class="emoji">🏡</span> Invernadero</h3>
+      <p>🌱 Humedad del Suelo: <span id="invernadero-humedadSuelo">--</span> %</p>
+      <p>🌡️ Temperatura Ambiente: <span id="invernadero-temperaturaAmbiente">--</span> °C</p>
+      <p>💡 Luminosidad: <span id="invernadero-luminosidad">--</span> lux</p>
+    </div>
+
+    <div class="card">
+      <h3><span class="emoji">🌾</span> Suelo</h3>
+      <p>🧪 Porcentaje Sustrato: <span id="suelo-porcentajeSustrato">--</span> %</p>
+      <p>💧 Humedad: <span id="suelo-humedad">--</span> %</p>
+      <p>🌿 Altura Plantas: <span id="suelo-alturaPlantas">--</span> cm</p>
+    </div>
+
+    <div class="card">
+      <h3><span class="emoji">🐔</span> Pollos</h3>
+      <p>🥚 Huevos Disponibles: <span id="pollos-huevosDisponibles">--</span> unidades</p>
+      <p>🌾 Kilos de Grano: <span id="pollos-kilosGranoDisponible">--</span> kg</p>
+      <p>🐣 Gallinas Empollando: <span id="pollos-gallinasEmpollando">--</span></p>
+    </div>
+
+    <div class="card">
+      <h3><span class="emoji">🐑</span> Ovejas</h3>
+      <p>🌿 Ovejas Comiendo: <span id="ovejas-ovejasComiendo">--</span></p>
+      <p>📏 Altura Pasto: <span id="ovejas-alturaPasto">--</span> cm</p>
+      <p>🌱 Superficie Pasto: <span id="ovejas-superficiePastoDisponible">--</span> m²</p>
+    </div>
+  </div>
+</section>
+
+<section class="config-section">
+  <h2>🔌 Conectar al Broker MQTT</h2>
+  <input type="text" id="brokerUrl" placeholder="ws://192.168.x.x:9001" />
+  <button onclick="connectMQTT()">Conectar</button>
+</section>
+
+<script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
+<script>
+  let client;
+
+  const topics = ["invernadero", "suelo", "pollos", "ovejas"];
+
+  function connectMQTT() {
+    const url = document.getElementById("brokerUrl").value;
+    if (!url) {
+      alert("Por favor ingresa la URL del broker MQTT (ej: ws://192.168.1.100:9001)");
+      return;
+    }
+
+    if (client) client.end();
+
+    client = mqtt.connect(url);
+
+    client.on("connect", () => {
+      console.log("Conectado al broker:", url);
+      topics.forEach(topic => client.subscribe(topic));
+    });
+
+    client.on("message", (topic, message) => {
+      try {
+        const data = JSON.parse(message.toString());
+        updateUI(topic, data);
+      } catch (e) {
+        console.error("Error al parsear mensaje MQTT:", e);
+      }
+    });
+
+    client.on("error", (err) => {
+      console.error("Error de conexión:", err);
+    });
+  }
+
+  function updateUI(topic, data) {
+    for (const key in data) {
+      const el = document.getElementById(`${topic}-${key}`);
+      if (el) el.textContent = data[key];
+    }
+  }
+</script>
+
+</body>
+</html>
